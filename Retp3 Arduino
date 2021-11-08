@@ -1,0 +1,46 @@
+void setup() {
+  Serial.begin(115200);
+}
+
+void loop() {
+
+  byte elbuffer[9];
+
+  if (Serial.available() >= 9) {
+
+    Serial.readBytes(elbuffer, 9);
+
+    byte flotantes[4] = {elbuffer[0], elbuffer[1], elbuffer[2], elbuffer[3]};
+    float traducido = *(float *)&flotantes;
+
+    byte flotantes2[4] = {elbuffer[5], elbuffer[6], elbuffer[7], elbuffer[8]};
+    float traducido2 = *(float *)&flotantes2;
+
+    float resultado = 0.0;
+
+    if (elbuffer[4] == 0x2B)
+    {
+      resultado = traducido + traducido2;
+    }
+     if (elbuffer[4] == 0x2D)
+    {
+      resultado = traducido - traducido2;
+    }
+     if (elbuffer[4] == 0x2A)
+    {
+      resultado = traducido * traducido2;
+    }
+     if (elbuffer[4] == 0x2F)
+    {
+      resultado = traducido / traducido2;
+    }    
+   
+    uint8_t cadena[4] = {0};
+    
+    memcpy(cadena, (uint8_t *)&resultado, 4);
+
+    Serial.write(cadena, 4);
+  }
+
+
+}
