@@ -1,0 +1,82 @@
+using System;
+using System.IO.Ports;
+using System.Text;
+
+namespace Solucion3Sistemas
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+
+            SerialPort port = new SerialPort();
+            port.PortName = "COM10";
+            port.BaudRate = 115200;
+            port.DtrEnable = true;
+            port.RtsEnable = true;
+            port.Open();
+
+
+            int sizebuffer = 4;
+
+            byte[] buffer = new byte[sizebuffer];
+
+            while (true)
+            {
+            
+                string entrada = Console.ReadLine();
+
+                if (entrada == "salir")
+                {
+                    port.Close();
+
+                    Environment.Exit(0);
+                }
+
+
+                if (entrada.Length > 0)
+                {
+                    string[] split = entrada.Split(' ');
+
+
+                    Single numero1 = Convert.ToSingle(split[0]);
+                    Single numero2 = Convert.ToSingle(split[2]);
+
+                    byte[] signo = Encoding.ASCII.GetBytes(split[1]);
+                    byte[] bnumero1 = BitConverter.GetBytes(numero1);
+                    byte[] bnumero2 = BitConverter.GetBytes(numero2);
+
+
+                    port.Write(bnumero1, 0, 4);
+                    port.Write(signo, 0, 1);
+                    port.Write(bnumero2, 0, 4);
+
+                    while (port.BytesToRead < sizebuffer)
+                    { }
+
+
+                    if (port.BytesToRead >= sizebuffer)
+                    {
+
+
+                        port.Read(buffer, 0, sizebuffer);
+
+
+
+                        Console.Write(System.BitConverter.ToSingle(buffer, 0));
+                    }
+                    else
+                    {
+
+                        Console.Write("Verifica si arduino esta conectado");
+                    }
+
+                   
+
+                }
+
+            }
+
+        }
+    }
+}
